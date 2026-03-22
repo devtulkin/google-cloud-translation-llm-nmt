@@ -1,0 +1,166 @@
+:root {
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  color: #10233f;
+  background:
+    radial-gradient(circle at top left, rgba(67, 160, 71, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(3, 155, 229, 0.15), transparent 24%),
+    linear-gradient(180deg, #f5f9ff 0%, #eef3fb 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.translator-shell {
+  width: min(1120px, 100%);
+  border: 1px solid rgba(16, 35, 63, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 24px 80px rgba(18, 34, 66, 0.14);
+  border-radius: 28px;
+  backdrop-filter: blur(14px);
+  padding: 28px;
+}
+
+.hero h1 {
+  margin: 8px 0 10px;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #2f6fed;
+}
+
+.subtitle {
+  margin: 0;
+  color: #4e6486;
+}
+
+.toolbar,
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.toolbar {
+  margin-top: 24px;
+}
+
+.toolbar label,
+.panel {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+}
+
+select,
+textarea,
+.model-button,
+.swap-button,
+.primary-button,
+.secondary-button {
+  border-radius: 16px;
+  border: 1px solid rgba(16, 35, 63, 0.12);
+}
+
+select,
+textarea {
+  padding: 14px 16px;
+  background: rgba(245, 249, 255, 0.88);
+}
+
+.model-toggle {
+  margin: 22px 0;
+  display: inline-flex;
+  gap: 10px;
+  background: rgba(236, 242, 252, 0.9);
+  padding: 8px;
+  border-radius: 18px;
+}
+
+.model-button,
+.swap-button,
+.primary-button,
+.secondary-button {
+  padding: 12px 18px;
+  cursor: pointer;
+  background: white;
+}
+
+.model-button.active,
+.primary-button {
+  background: linear-gradient(135deg, #1464f4 0%, #08a7d8 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.icon-button {
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+.icon-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 320px;
+  resize: vertical;
+}
+
+.actions {
+  margin-top: 18px;
+}
+
+.secondary-button {
+  background: rgba(16, 35, 63, 0.04);
+}
+
+.error {
+  color: #bf2f45;
+}
+
+@media (max-width: 768px) {
+  .translator-shell {
+    padding: 20px;
+  }
+
+  .panels {
+    grid-template-columns: 1fr;
+  }
+}
