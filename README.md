@@ -83,7 +83,7 @@ Sizga kerak bo‘ladigan eng muhim qiymat:
 Masalan:
 
 ```text
-wordexpert-translation-prod
+my-translation-project
 ```
 
 `Project name` va `Project ID` bir xil bo‘lishi shart emas. Kodingizda aynan `Project ID` ishlatiladi.
@@ -181,7 +181,7 @@ gcloud config set project YOUR_PROJECT_ID
 Misol:
 
 ```bash
-gcloud config set project wordexpert-translation-prod
+gcloud config set project my-translation-project
 ```
 
 Tekshirish:
@@ -536,7 +536,7 @@ journalctl -u google-cloud-translation-llm-nmt -f
 Frontend statik build’ni serve qiladi va `/api` requestlarni backend’ga uzatadi.
 
 ```bash
-sudo nano /etc/nginx/sites-available/trns.wordexpert.ai
+sudo nano /etc/nginx/sites-available/app.example.com
 ```
 
 Ichiga:
@@ -544,7 +544,7 @@ Ichiga:
 ```nginx
 server {
     listen 80;
-    server_name trns.wordexpert.ai;
+    server_name app.example.com;
 
     root /var/www/google-cloud-translation-llm-nmt/client/dist;
     index index.html;
@@ -567,23 +567,23 @@ server {
 Aktiv qiling:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/trns.wordexpert.ai /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/app.example.com /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-## 11. DNS Setup For `trns.wordexpert.ai`
+## 11. DNS Setup For Your Domain
 
 DigitalOcean DNS ichida:
 
 - Type: `A`
-- Hostname: `trns`
+- Hostname: subdomain yoki root domain
 - Value: server IP
 
 Tekshirish:
 
 ```bash
-dig trns.wordexpert.ai +short
+dig app.example.com +short
 ```
 
 Natijada sizning server IP chiqishi kerak.
@@ -602,7 +602,7 @@ sudo ln -s /snap/bin/certbot /usr/bin/certbot
 SSL certificate oling:
 
 ```bash
-sudo certbot --nginx -d trns.wordexpert.ai
+sudo certbot --nginx -d app.example.com
 ```
 
 Renew test:
@@ -644,13 +644,13 @@ curl http://127.0.0.1:8787/api/health
 Public HTTP:
 
 ```bash
-curl -I http://trns.wordexpert.ai
+curl -I http://app.example.com
 ```
 
 Public HTTPS:
 
 ```bash
-curl -I https://trns.wordexpert.ai
+curl -I https://app.example.com
 ```
 
 ## 16. Security Notes
