@@ -1,30 +1,36 @@
 # Google Cloud Translation LLM + NMT
 
-Google Cloud asosida qurilgan ikki panelli tarjimon web ilova. Ilova `English (en)`, `Russian (ru)`, va `Uzbek (uz)` tillari orasida tarjima qiladi va foydalanuvchiga ikkita modeldan birini tanlash imkonini beradi:
+A production-ready web translator built with Google Cloud Translation APIs. The app provides a familiar two-panel translation interface and lets users switch between:
 
 - `LLM`: Google Cloud `Translation LLM`
 - `NMT`: Google Cloud `Cloud Translation Neural Machine Translation`
 
-Frontend `Vite + React`, backend esa `Express + TypeScript` bilan yozilgan. Google Cloud chaqiruvlari faqat server tomonda bajariladi, shu sabab browser ichiga hech qanday Google credential chiqmaydi.
+It currently supports translation between:
+
+- `English (en)`
+- `Russian (ru)`
+- `Uzbek (uz)`
+
+The frontend is built with `Vite + React`, and the backend is built with `Express + TypeScript`. All Google Cloud requests are made server-side so credentials are never exposed to the browser.
 
 ## Features
 
-- `en`, `ru`, `uz` tillari orasida ikki yo‘nalishli tarjima
-- `LLM` va `NMT` model tanlovi
-- `translate.google.com` uslubidagi ikki panel interfeys
-- tilni almashtirish uchun swap icon
-- `Translate`, `Copy result`, `Clear` amallari
-- uzun matnlar uchun backend chunking
-- request validation va xatolarni normalizatsiya qilish
-- lokal development uchun ADC
-- production uchun server-side service account credential ulash imkoniyati
+- Translate between `en`, `ru`, and `uz`
+- Switch between `LLM` and `NMT`
+- Two-panel translator UI inspired by familiar online translation tools
+- Language swap control
+- `Translate`, `Copy result`, and `Clear` actions
+- Long-text chunking on the backend
+- Request validation and normalized API errors
+- Local development with Google ADC
+- Production deployment support with service account credentials
 
-## Stack
+## Tech Stack
 
 - Frontend: `React`, `Vite`, `TypeScript`
 - Backend: `Express`, `TypeScript`, `zod`
-- Google Cloud SDK: `@google-cloud/translate`
-- Testlar: `Vitest`, `Testing Library`
+- Google SDK: `@google-cloud/translate`
+- Testing: `Vitest`, `Testing Library`
 
 ## Project Structure
 
@@ -52,170 +58,56 @@ Frontend `Vite + React`, backend esa `Express + TypeScript` bilan yozilgan. Goog
 
 ## Requirements
 
-Lokal development uchun:
+For local development:
 
-- `Node.js 20+` yoki `Node.js 22+`
+- `Node.js 20+` or `Node.js 22+`
 - `npm 10+`
 - `gcloud CLI`
-- Google Cloud project
-- Cloud Translation API va Vertex AI yoqilgan hisob
+- A Google Cloud project
+- `Cloud Translation API` enabled
+- `Vertex AI API` enabled
 
-Production server uchun qo‘shimcha:
+For production deployment:
 
-- Ubuntu server yoki shunga o‘xshash Linux server
+- A Linux server such as Ubuntu
 - `nginx`
 - `systemd`
-- SSL uchun `certbot`
-- GitHub’dan repository clone qilish imkoniyati
+- SSL support through `certbot`
+- Access to a Git host such as GitHub
 
-## 1. Google Cloud Setup
+## Quick Start
 
-Bu bo‘limni diqqat bilan bajaring. Loyiha ishlashi uchun aynan shu qadamlar kerak.
+This is the fastest way to get the project running locally.
 
-### 1.1. Google Cloud project yarating yoki mavjud projectni tanlang
-
-Google Cloud Console’da yangi project yarating yoki mavjud projectni tanlang.
-
-Sizga kerak bo‘ladigan eng muhim qiymat:
-
-- `Project ID`
-
-Masalan:
-
-```text
-my-translation-project
-```
-
-`Project name` va `Project ID` bir xil bo‘lishi shart emas. Kodingizda aynan `Project ID` ishlatiladi.
-
-### 1.2. Billing yoqilganini tekshiring
-
-Cloud Translation va Vertex AI odatda billing talab qiladi. Billing yoqilmagan bo‘lsa, API chaqiruvlari ishlamasligi mumkin.
-
-Tekshirish:
-
-- Google Cloud Console
-- `Billing`
-- project billing account bilan ulangan bo‘lishi kerak
-
-### 1.3. Kerakli API’larni yoqing
-
-Quyidagi API’lar kerak:
-
-- `Cloud Translation API`
-- `Vertex AI API`
-
-CLI orqali yoqish:
-
-```bash
-gcloud services enable translate.googleapis.com
-gcloud services enable aiplatform.googleapis.com
-```
-
-### 1.4. Kerakli IAM ruxsatlarini tayyorlang
-
-Lokal development uchun sizning user hisobingiz yoki production service account quyidagi xizmatlardan foydalana olishi kerak:
-
-- Cloud Translation
-- Vertex AI translation yo‘li
-
-Eng amaliy yo‘l:
-
-- development uchun project owner/editor bilan sinash
-- production uchun alohida service account yaratish
-
-## 2. Local Development Setup
-
-### 2.1. Repository’ni clone qiling
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/devtulkin/google-cloud-translation-llm-nmt.git
 cd google-cloud-translation-llm-nmt
 ```
 
-### 2.2. Dependency’larni o‘rnating
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2.3. gcloud CLI o‘rnating
-
-Avval `gcloud` mavjudligini tekshiring:
-
-```bash
-gcloud version
-```
-
-Yo‘q bo‘lsa, Google Cloud CLI’ni o‘rnating:
-
-- macOS: Homebrew yoki rasmiy installer
-- Ubuntu: Google Cloud SDK repository orqali
-
-Rasmiy yo‘riqnoma:
-
-- [Install gcloud CLI](https://cloud.google.com/sdk/docs/install)
-
-### 2.4. gcloud login qiling
-
-Bu `gcloud` CLI uchun login:
+### 3. Log in to Google Cloud
 
 ```bash
 gcloud auth login
-```
-
-Bu buyruq brauzer oynasini ochadi. Google account bilan kirasiz va ruxsat berasiz.
-
-Tekshirish:
-
-```bash
-gcloud auth list
-```
-
-### 2.5. Active project ni tanlang
-
-```bash
 gcloud config set project YOUR_PROJECT_ID
-```
-
-Misol:
-
-```bash
-gcloud config set project my-translation-project
-```
-
-Tekshirish:
-
-```bash
-gcloud config list
-```
-
-### 2.6. Application Default Credentials (ADC) ni sozlang
-
-Lokal development uchun loyiha `ADC` ishlatadi.
-
-```bash
 gcloud auth application-default login
 ```
 
-Bu ham brauzer ochadi. Auth tugagach, local credential fayl yaratiladi.
-
-Tekshirish:
-
-```bash
-gcloud auth application-default print-access-token
-```
-
-Agar token chiqsa, ADC ishlayapti.
-
-### 2.7. Environment fayllarni yarating
+### 4. Create environment files
 
 ```bash
 cp server/.env.example server/.env
 cp client/.env.example client/.env
 ```
 
-#### `server/.env`
+Update `server/.env`:
 
 ```env
 PORT=8787
@@ -225,247 +117,124 @@ MAX_TRANSLATION_CHARS=12000
 CHUNK_SIZE_CHARS=3000
 ```
 
-#### `client/.env`
-
-```env
-VITE_API_BASE_URL=/api
-```
-
-### 2.8. Lokal development serverni ishga tushiring
+### 5. Start the app
 
 ```bash
 npm run dev
 ```
 
-Ochiladigan adreslar:
+Open:
 
 - Frontend: `http://localhost:5173`
-- Backend: `http://localhost:8787`
-- Health endpoint: `http://localhost:8787/api/health`
+- Backend health check: `http://localhost:8787/api/health`
 
-### 2.9. Health check
-
-```bash
-curl http://localhost:8787/api/health
-```
-
-Kutilgan javob:
-
-```json
-{"status":"ok"}
-```
-
-### 2.10. Lokal production build test
+### 6. Run tests and build
 
 ```bash
 npm test
 npm run build
 ```
 
-## 3. How Google Credentials Work In This Project
+## Google Cloud Setup
 
-Loyiha browser’dan Google Cloud’ga to‘g‘ridan-to‘g‘ri ulanmaydi.
+This project depends on Google Cloud Translation and Vertex AI translation capabilities. The steps below are required for both local development and production.
 
-Flow:
+### 1. Create or select a Google Cloud project
 
-1. Browser backend’ga `/api/translate` request yuboradi
-2. Backend requestni validatsiya qiladi
-3. Backend tanlangan modelga qarab:
-   - `NMT`
-   - `LLM`
-   adapteriga yuboradi
-4. Google Cloud translation javobi backend orqali frontend’ga qaytadi
+You need the project's `Project ID`, not just its display name.
 
-Shu sabab:
+Example:
 
-- browser’ga Google credential chiqmaydi
-- production’da faqat backend credential biladi
-
-## 4. Common Local Problems
-
-### 4.1. `GOOGLE_CLOUD_PROJECT is required`
-
-Sabab:
-
-- `server/.env` ichida `GOOGLE_CLOUD_PROJECT` yo‘q
-
-Yechim:
-
-- `server/.env` ga to‘g‘ri project ID yozing
-
-### 4.2. Authentication xatolari
-
-Sabab:
-
-- `gcloud auth application-default login` qilinmagan
-- noto‘g‘ri account bilan login qilingan
-
-Yechim:
-
-```bash
-gcloud auth application-default revoke
-gcloud auth application-default login
+```text
+my-translation-project
 ```
 
-### 4.3. API disabled xatosi
+### 2. Enable billing
 
-Sabab:
+Cloud Translation and Vertex AI usually require billing to be enabled. If billing is disabled, requests may fail even if your code is correct.
 
-- `translate.googleapis.com` yoki `aiplatform.googleapis.com` yoqilmagan
-
-Yechim:
+### 3. Enable the required APIs
 
 ```bash
 gcloud services enable translate.googleapis.com
 gcloud services enable aiplatform.googleapis.com
 ```
 
-### 4.4. Permission denied
+Required APIs:
 
-Sabab:
+- `Cloud Translation API`
+- `Vertex AI API`
 
-- user account yoki service account kerakli ruxsatga ega emas
+### 4. Make sure the caller has permission
 
-Yechim:
+For local development, your Google user account must have access to the project and enabled APIs.
 
-- IAM ichida translation va vertex access ni tekshiring
+For production, your service account must have permission to call the translation services used by the app.
 
-## 5. Production Deployment Overview
+### 5. Install the gcloud CLI
 
-Tavsiya etilgan production arxitektura:
+If needed, install it from the official docs:
 
-- `DigitalOcean Droplet`
-- `Nginx` reverse proxy
-- `systemd` orqali Node backend service
-- frontend `client/dist` statik fayllar sifatida
-- backend `server/dist/index.js`
-- `Let’s Encrypt` orqali SSL
-- Google Cloud service account JSON server ichida saqlanadi
+- [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install)
 
-## 6. Production Deployment On A Server
-
-Quyidagi qadamlar Ubuntu server uchun yozilgan.
-
-### 6.1. Serverga ulaning
+Check your installation:
 
 ```bash
-ssh root@YOUR_SERVER_IP
+gcloud version
 ```
 
-Yoki boshqa sudo user bilan:
+## Local Development Guide
+
+### Authenticate with Google Cloud
+
+Log in to the CLI:
 
 ```bash
-ssh your-user@YOUR_SERVER_IP
+gcloud auth login
 ```
 
-### 6.2. Server paketlarini yangilang
+Check the authenticated account:
 
 ```bash
-sudo apt update
-sudo apt upgrade -y
+gcloud auth list
 ```
 
-### 6.3. Nginx, Node.js, Git ni o‘rnating
+Set the active project:
 
 ```bash
-sudo apt install -y nginx git curl
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
+gcloud config set project YOUR_PROJECT_ID
 ```
 
-Tekshirish:
+Verify:
 
 ```bash
-node -v
-npm -v
-nginx -v
+gcloud config list
 ```
 
-### 6.4. Application papkasini tayyorlang
+### Set up Application Default Credentials (ADC)
+
+This project uses ADC for local development.
 
 ```bash
-sudo mkdir -p /var/www/google-cloud-translation-llm-nmt
-sudo chown -R $USER:$USER /var/www/google-cloud-translation-llm-nmt
-cd /var/www/google-cloud-translation-llm-nmt
+gcloud auth application-default login
 ```
 
-### 6.5. Repository’ni clone qiling
+Verify that ADC works:
 
 ```bash
-git clone https://github.com/devtulkin/google-cloud-translation-llm-nmt.git .
+gcloud auth application-default print-access-token
 ```
 
-### 6.6. Production dependency va build
+If you receive an access token, ADC is working correctly.
+
+### Create local environment files
 
 ```bash
-npm install
-npm run build
+cp server/.env.example server/.env
+cp client/.env.example client/.env
 ```
 
-## 7. Google Cloud Production Credential Setup
-
-Production server uchun `gcloud auth application-default login` ishlatish tavsiya etilmaydi. Eng amaliy yo‘l:
-
-- alohida `service account` yarating
-- faqat kerakli ruxsat bering
-- JSON key yarating
-- serverga xavfsiz joyga joylashtiring
-
-### 7.1. Service account yarating
-
-Google Cloud Console ichida:
-
-- `IAM & Admin`
-- `Service Accounts`
-- `Create Service Account`
-
-Masalan nom:
-
-```text
-translation-runtime
-```
-
-### 7.2. Kerakli ruxsatlarni bering
-
-Amalda project va API konfiguratsiyasiga qarab ruxsatlar o‘zgarishi mumkin, lekin translation chaqiruvlari uchun translation va vertex access kerak bo‘ladi.
-
-Kamida:
-
-- translation ishlatish huquqi
-- vertex translation yo‘li uchun access
-
-Production’da minimal privilege printsipi bilan boring.
-
-### 7.3. JSON key yarating
-
-Service account ichida:
-
-- `Keys`
-- `Add key`
-- `Create new key`
-- `JSON`
-
-JSON faylni yuklab oling.
-
-### 7.4. JSON faylni serverga joylang
-
-```bash
-sudo mkdir -p /opt/google-cloud-translation-llm-nmt/secrets
-sudo nano /opt/google-cloud-translation-llm-nmt/secrets/gcp-service-account.json
-sudo chmod 600 /opt/google-cloud-translation-llm-nmt/secrets/gcp-service-account.json
-```
-
-Yuklab olingan JSON ichidagini shu faylga joylashtiring.
-
-## 8. Production Environment Variables
-
-Serverda env fayl yarating:
-
-```bash
-sudo nano /etc/google-cloud-translation-llm-nmt.env
-```
-
-Ichiga:
+`server/.env`
 
 ```env
 PORT=8787
@@ -473,222 +242,57 @@ GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
 GOOGLE_CLOUD_LOCATION=global
 MAX_TRANSLATION_CHARS=12000
 CHUNK_SIZE_CHARS=3000
-GOOGLE_APPLICATION_CREDENTIALS=/opt/google-cloud-translation-llm-nmt/secrets/gcp-service-account.json
 ```
 
-Izoh:
+`client/.env`
 
-- `GOOGLE_APPLICATION_CREDENTIALS` production server uchun juda muhim
-- aynan service account JSON yo‘lini ko‘rsatadi
+```env
+VITE_API_BASE_URL=/api
+```
 
-## 9. systemd Service Setup
-
-`systemd` backend’ni doimiy ishlatib turadi va server restart bo‘lsa qayta ko‘taradi.
+### Start the local app
 
 ```bash
-sudo nano /etc/systemd/system/google-cloud-translation-llm-nmt.service
-```
-
-Ichiga:
-
-```ini
-[Unit]
-Description=Google Cloud Translation LLM + NMT backend
-After=network.target
-
-[Service]
-Type=simple
-WorkingDirectory=/var/www/google-cloud-translation-llm-nmt/server
-EnvironmentFile=/etc/google-cloud-translation-llm-nmt.env
-ExecStart=/usr/bin/node /var/www/google-cloud-translation-llm-nmt/server/dist/index.js
-Restart=always
-RestartSec=5
-User=www-data
-Group=www-data
-
-[Install]
-WantedBy=multi-user.target
-```
-
-File ownership:
-
-```bash
-sudo chown -R www-data:www-data /var/www/google-cloud-translation-llm-nmt
-```
-
-Service’ni ishga tushiring:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable google-cloud-translation-llm-nmt
-sudo systemctl start google-cloud-translation-llm-nmt
-sudo systemctl status google-cloud-translation-llm-nmt
-```
-
-Log ko‘rish:
-
-```bash
-journalctl -u google-cloud-translation-llm-nmt -f
-```
-
-## 10. Nginx Reverse Proxy Setup
-
-Frontend statik build’ni serve qiladi va `/api` requestlarni backend’ga uzatadi.
-
-```bash
-sudo nano /etc/nginx/sites-available/app.example.com
-```
-
-Ichiga:
-
-```nginx
-server {
-    listen 80;
-    server_name app.example.com;
-
-    root /var/www/google-cloud-translation-llm-nmt/client/dist;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location /api/ {
-        proxy_pass http://127.0.0.1:8787/api/;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-Aktiv qiling:
-
-```bash
-sudo ln -s /etc/nginx/sites-available/app.example.com /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-## 11. DNS Setup For Your Domain
-
-DigitalOcean DNS ichida:
-
-- Type: `A`
-- Hostname: subdomain yoki root domain
-- Value: server IP
-
-Tekshirish:
-
-```bash
-dig app.example.com +short
-```
-
-Natijada sizning server IP chiqishi kerak.
-
-## 12. SSL Setup With Let’s Encrypt
-
-`certbot` o‘rnating:
-
-```bash
-sudo snap install core
-sudo snap refresh core
-sudo snap install --classic certbot
-sudo ln -s /snap/bin/certbot /usr/bin/certbot
-```
-
-SSL certificate oling:
-
-```bash
-sudo certbot --nginx -d app.example.com
-```
-
-Renew test:
-
-```bash
-sudo certbot renew --dry-run
-```
-
-## 13. Firewall Setup
-
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
-sudo ufw enable
-sudo ufw status
-```
-
-## 14. Deploy / Update Workflow
-
-Kod yangilanganda:
-
-```bash
-cd /var/www/google-cloud-translation-llm-nmt
-git pull
-npm install
-npm run build
-sudo systemctl restart google-cloud-translation-llm-nmt
-sudo systemctl reload nginx
-```
-
-## 15. Production Health Checks
-
-Backend:
-
-```bash
-curl http://127.0.0.1:8787/api/health
-```
-
-Public HTTP:
-
-```bash
-curl -I http://app.example.com
-```
-
-Public HTTPS:
-
-```bash
-curl -I https://app.example.com
-```
-
-## 16. Security Notes
-
-- `server/.env` va production env fayllarni Git ichiga qo‘ymang
-- service account JSON faylni repository ichiga saqlamang
-- `GOOGLE_APPLICATION_CREDENTIALS` production’da faqat serverdagi xavfsiz joyga pointing qilsin
-- `chmod 600` ishlating
-- production’da kerak bo‘lmagan ochiq portlarni yopiq saqlang
-
-## 17. Useful Commands
-
-### Local
-
-```bash
-npm install
 npm run dev
-npm test
-npm run build
 ```
 
-### Production service
+Available local endpoints:
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8787`
+- Health check: `http://localhost:8787/api/health`
+
+### Health check
 
 ```bash
-sudo systemctl status google-cloud-translation-llm-nmt
-sudo systemctl restart google-cloud-translation-llm-nmt
-journalctl -u google-cloud-translation-llm-nmt -f
+curl http://localhost:8787/api/health
 ```
 
-### Nginx
+Expected response:
 
-```bash
-sudo nginx -t
-sudo systemctl reload nginx
-sudo systemctl restart nginx
+```json
+{"status":"ok"}
 ```
 
-## 18. API Summary
+## How Credentials Work In This Project
+
+The browser never talks directly to Google Cloud.
+
+The flow is:
+
+1. The browser sends a request to `/api/translate`
+2. The Express backend validates the request
+3. The backend dispatches the request to either:
+   - `NMT`
+   - `LLM`
+4. The backend returns the translated response to the frontend
+
+This means:
+
+- Google credentials stay on the server
+- Production deployments remain private by design
+
+## API Summary
 
 ### `GET /api/health`
 
@@ -724,32 +328,514 @@ Response:
 }
 ```
 
-## 19. Important Notes About LLM vs NMT
+## Production Deployment Overview
 
-- `NMT` odatda tezroq ishlaydi
-- `LLM` ayrim holatlarda tabiiyroq tarjima berishi mumkin
-- ikkala model ham backend orqali boshqariladi
-- frontend faqat model tanlovini yuboradi
+The recommended deployment shape is:
 
-## 20. Recommended First-Time Checklist
+- A Linux server such as Ubuntu
+- `nginx` as a reverse proxy
+- `systemd` to run the backend process
+- Static frontend assets served from `client/dist`
+- Node backend served from `server/dist/index.js`
+- SSL via Let's Encrypt
+- A Google Cloud service account JSON file stored securely on the server
 
-Agar birinchi marta o‘rnatayotgan bo‘lsangiz, shu ketma-ketlik bo‘yicha boring:
+## Production Deployment Guide
 
-1. Google Cloud project tayyorlang
-2. Billing yoqing
-3. `translate.googleapis.com` va `aiplatform.googleapis.com` ni yoqing
-4. Repo’ni clone qiling
-5. `npm install`
-6. `gcloud auth login`
-7. `gcloud config set project YOUR_PROJECT_ID`
-8. `gcloud auth application-default login`
-9. `cp server/.env.example server/.env`
-10. `server/.env` ichiga `GOOGLE_CLOUD_PROJECT` yozing
-11. `npm run dev`
-12. browser’da tekshiring
-13. `npm test`
-14. `npm run build`
-15. production server bo‘lsa `service account`, `systemd`, `nginx`, `ssl`, `dns` qadamlarini bajaring
+The steps below assume an Ubuntu-based server.
+
+### 1. Connect to your server
+
+```bash
+ssh root@YOUR_SERVER_IP
+```
+
+Or use a non-root sudo user:
+
+```bash
+ssh your-user@YOUR_SERVER_IP
+```
+
+### 2. Update packages
+
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+### 3. Install Nginx, Git, curl, and Node.js
+
+```bash
+sudo apt install -y nginx git curl
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+Verify:
+
+```bash
+node -v
+npm -v
+nginx -v
+```
+
+### 4. Create an app directory
+
+```bash
+sudo mkdir -p /var/www/google-cloud-translation-llm-nmt
+sudo chown -R $USER:$USER /var/www/google-cloud-translation-llm-nmt
+cd /var/www/google-cloud-translation-llm-nmt
+```
+
+### 5. Clone the repository
+
+```bash
+git clone https://github.com/devtulkin/google-cloud-translation-llm-nmt.git .
+```
+
+### 6. Install dependencies and build
+
+```bash
+npm install
+npm run build
+```
+
+## Production Google Cloud Credential Setup
+
+For production, do not rely on `gcloud auth application-default login` on the server unless you explicitly want user-based credentials on that machine. The recommended path is a dedicated service account.
+
+### 1. Create a service account
+
+In Google Cloud Console:
+
+- Go to `IAM & Admin`
+- Open `Service Accounts`
+- Click `Create Service Account`
+
+Example service account name:
+
+```text
+translation-runtime
+```
+
+### 2. Grant only the required permissions
+
+Permissions vary by project policy and API configuration, but the runtime identity must be allowed to call the translation services used by the app.
+
+Use the principle of least privilege.
+
+### 3. Create a JSON key
+
+In the service account page:
+
+- Open `Keys`
+- Click `Add key`
+- Select `Create new key`
+- Choose `JSON`
+
+Download the JSON file.
+
+### 4. Place the JSON file on the server
+
+```bash
+sudo mkdir -p /opt/google-cloud-translation-llm-nmt/secrets
+sudo nano /opt/google-cloud-translation-llm-nmt/secrets/gcp-service-account.json
+sudo chmod 600 /opt/google-cloud-translation-llm-nmt/secrets/gcp-service-account.json
+```
+
+Paste the downloaded JSON into that file.
+
+## Production Environment Variables
+
+Create a production env file:
+
+```bash
+sudo nano /etc/google-cloud-translation-llm-nmt.env
+```
+
+Example:
+
+```env
+PORT=8787
+GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
+GOOGLE_CLOUD_LOCATION=global
+MAX_TRANSLATION_CHARS=12000
+CHUNK_SIZE_CHARS=3000
+GOOGLE_APPLICATION_CREDENTIALS=/opt/google-cloud-translation-llm-nmt/secrets/gcp-service-account.json
+```
+
+Important:
+
+- `GOOGLE_APPLICATION_CREDENTIALS` should point to the service account JSON file
+- `GOOGLE_CLOUD_PROJECT` must match the GCP project used by the APIs
+
+## systemd Setup
+
+Create a systemd service:
+
+```bash
+sudo nano /etc/systemd/system/google-cloud-translation-llm-nmt.service
+```
+
+Service file:
+
+```ini
+[Unit]
+Description=Google Cloud Translation LLM + NMT backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/google-cloud-translation-llm-nmt/server
+EnvironmentFile=/etc/google-cloud-translation-llm-nmt.env
+ExecStart=/usr/bin/node /var/www/google-cloud-translation-llm-nmt/server/dist/index.js
+Restart=always
+RestartSec=5
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Update ownership:
+
+```bash
+sudo chown -R www-data:www-data /var/www/google-cloud-translation-llm-nmt
+```
+
+Start the service:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable google-cloud-translation-llm-nmt
+sudo systemctl start google-cloud-translation-llm-nmt
+sudo systemctl status google-cloud-translation-llm-nmt
+```
+
+View logs:
+
+```bash
+journalctl -u google-cloud-translation-llm-nmt -f
+```
+
+## Nginx Reverse Proxy Setup
+
+Create an Nginx site config:
+
+```bash
+sudo nano /etc/nginx/sites-available/app.example.com
+```
+
+Example config:
+
+```nginx
+server {
+    listen 80;
+    server_name app.example.com;
+
+    root /var/www/google-cloud-translation-llm-nmt/client/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8787/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Enable the config:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/app.example.com /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+## DNS Setup
+
+Point your domain or subdomain to the server's public IP address.
+
+Example DNS record:
+
+- Type: `A`
+- Hostname: your chosen hostname
+- Value: your server IP
+
+Verify:
+
+```bash
+dig app.example.com +short
+```
+
+## SSL Setup With Let's Encrypt
+
+Install Certbot:
+
+```bash
+sudo snap install core
+sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+```
+
+Issue a certificate:
+
+```bash
+sudo certbot --nginx -d app.example.com
+```
+
+Verify renewal:
+
+```bash
+sudo certbot renew --dry-run
+```
+
+## Firewall Setup
+
+```bash
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
+sudo ufw status
+```
+
+## Deploy / Update Workflow
+
+When you update the code:
+
+```bash
+cd /var/www/google-cloud-translation-llm-nmt
+git pull
+npm install
+npm run build
+sudo systemctl restart google-cloud-translation-llm-nmt
+sudo systemctl reload nginx
+```
+
+## Production Checklist
+
+Before calling the deployment complete, verify all of the following:
+
+- Google Cloud billing is enabled
+- `translate.googleapis.com` is enabled
+- `aiplatform.googleapis.com` is enabled
+- `GOOGLE_CLOUD_PROJECT` is set correctly
+- The service account has the required permissions
+- `GOOGLE_APPLICATION_CREDENTIALS` points to a real JSON file on disk
+- `npm run build` completes successfully on the server
+- The backend service is active in `systemd`
+- `nginx -t` passes
+- DNS resolves to the correct server IP
+- SSL is active and browser traffic loads over HTTPS
+- `GET /api/health` returns `{"status":"ok"}`
+- Both `LLM` and `NMT` translation paths work in production
+
+## Health Checks
+
+Backend:
+
+```bash
+curl http://127.0.0.1:8787/api/health
+```
+
+Public HTTP:
+
+```bash
+curl -I http://app.example.com
+```
+
+Public HTTPS:
+
+```bash
+curl -I https://app.example.com
+```
+
+## Troubleshooting
+
+### `GOOGLE_CLOUD_PROJECT is required`
+
+Cause:
+
+- The backend env file does not define `GOOGLE_CLOUD_PROJECT`
+
+Fix:
+
+- Add it to `server/.env` locally or your production env file on the server
+
+### Authentication errors
+
+Cause:
+
+- ADC has not been configured locally
+- The wrong Google account was used
+- The production service account JSON path is incorrect
+
+Fix:
+
+Local:
+
+```bash
+gcloud auth application-default revoke
+gcloud auth application-default login
+```
+
+Production:
+
+- Verify `GOOGLE_APPLICATION_CREDENTIALS`
+- Verify file permissions
+- Verify the JSON file contents
+
+### API disabled errors
+
+Cause:
+
+- `translate.googleapis.com` or `aiplatform.googleapis.com` is not enabled
+
+Fix:
+
+```bash
+gcloud services enable translate.googleapis.com
+gcloud services enable aiplatform.googleapis.com
+```
+
+### Permission denied
+
+Cause:
+
+- The Google user or service account does not have the required access
+
+Fix:
+
+- Review IAM roles and project access
+
+### Nginx returns `502 Bad Gateway`
+
+Cause:
+
+- The backend is not running
+- The backend is not listening on the expected port
+- `proxy_pass` points to the wrong port
+
+Fix:
+
+```bash
+sudo systemctl status google-cloud-translation-llm-nmt
+journalctl -u google-cloud-translation-llm-nmt -f
+curl http://127.0.0.1:8787/api/health
+```
+
+### SSL certificate request fails
+
+Cause:
+
+- DNS does not point to the server yet
+- Ports `80` and `443` are blocked
+- Nginx config is invalid
+
+Fix:
+
+- Verify DNS propagation
+- Open firewall ports
+- Run `sudo nginx -t`
+
+## FAQ
+
+### Why does the app use a backend instead of calling Google Cloud directly from the browser?
+
+Because Google Cloud credentials must stay private. Exposing them in frontend code would be insecure.
+
+### Can I deploy this without DigitalOcean?
+
+Yes. Any Linux server or VM that can run Node.js, Nginx, and store Google Cloud credentials securely will work.
+
+### Can I use Docker instead of systemd and Nginx?
+
+Yes. This repository does not require Docker, but you can containerize both the frontend and backend if that fits your infrastructure.
+
+### Can I use only NMT or only LLM?
+
+Yes. The app supports both, but you can simplify the UI and backend if you want to expose only one translation path.
+
+### Does this app support browser-side Google authentication?
+
+No. The design intentionally keeps Google authentication on the backend.
+
+### Can I add more languages?
+
+Yes, but you should first confirm language support for both `Translation LLM` and `NMT` in Google Cloud, then update:
+
+- frontend language options
+- backend validation
+- test coverage
+
+### Is local ADC suitable for production?
+
+Usually no. Production should use a service account or another server-safe identity mechanism.
+
+## Security Notes
+
+- Do not commit `.env` files
+- Do not commit service account JSON files
+- Keep credentials outside the repository
+- Use `chmod 600` for production credential files
+- Restrict server access and expose only the ports you need
+
+## Useful Commands
+
+### Local
+
+```bash
+npm install
+npm run dev
+npm test
+npm run build
+```
+
+### Production service
+
+```bash
+sudo systemctl status google-cloud-translation-llm-nmt
+sudo systemctl restart google-cloud-translation-llm-nmt
+journalctl -u google-cloud-translation-llm-nmt -f
+```
+
+### Nginx
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+sudo systemctl restart nginx
+```
+
+## Recommended First-Time Setup Checklist
+
+If you are installing this for the first time, follow this order:
+
+1. Create a Google Cloud project
+2. Enable billing
+3. Enable `translate.googleapis.com`
+4. Enable `aiplatform.googleapis.com`
+5. Clone the repository
+6. Run `npm install`
+7. Run `gcloud auth login`
+8. Run `gcloud config set project YOUR_PROJECT_ID`
+9. Run `gcloud auth application-default login`
+10. Create `server/.env`
+11. Set `GOOGLE_CLOUD_PROJECT`
+12. Run `npm run dev`
+13. Verify the UI loads
+14. Run `npm test`
+15. Run `npm run build`
+16. For production, set up the service account, env file, systemd, nginx, DNS, and SSL
 
 ## References
 
